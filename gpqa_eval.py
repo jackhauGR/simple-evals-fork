@@ -4,11 +4,13 @@ David Rein, Betty Li Hou, Asa Cooper Stickland, Jackson Petty, Richard Yuanzhe P
 https://arxiv.org/abs/2311.12022
 """
 
+import io
 import random
 import re
 
 import blobfile as bf
 import pandas
+import requests
 
 from . import common
 from .common import ANSWER_PATTERN_MULTICHOICE, HTML_JINJA, format_multichoice_question
@@ -23,9 +25,9 @@ class GPQAEval(Eval):
         num_examples: int | None = None,  # restrict to a subset of the data for debugging
     ):
         df = pandas.read_csv(
-            bf.BlobFile(
+            io.StringIO(requests.get(
                 f"https://openaipublic.blob.core.windows.net/simple-evals/gpqa_{variant}.csv"
-            )
+            ).content.decode())
         )
         examples = [row.to_dict() for _, row in df.iterrows()]
         rng = random.Random(0)

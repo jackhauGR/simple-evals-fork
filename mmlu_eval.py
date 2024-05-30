@@ -4,11 +4,13 @@ Dan Hendrycks, Collin Burns, Steven Basart, Andy Zou, Mantas Mazeika, Dawn Song,
 https://arxiv.org/abs/2009.03300
 """
 
+import io
 import random
 import re
 
 import blobfile as bf
 import pandas
+import requests
 
 from . import common
 from .common import ANSWER_PATTERN_MULTICHOICE, HTML_JINJA, format_multichoice_question
@@ -78,7 +80,9 @@ subject2category = {
 class MMLUEval(Eval):
     def __init__(self, num_examples: int | None = None):
         df = pandas.read_csv(
-            bf.BlobFile("https://openaipublic.blob.core.windows.net/simple-evals/mmlu.csv")
+            io.StringIO(requests.get(
+                "https://openaipublic.blob.core.windows.net/simple-evals/mmlu.csv"
+            ).content.decode())
         )
         examples = [row.to_dict() for _, row in df.iterrows()]
         if num_examples:
