@@ -58,7 +58,7 @@ class GPQAEval(Eval):
                     content=format_multichoice_question(choices_dict), role="user"
                 )
             ]
-            response_text = sampler(prompt_messages)
+            response_text, prompt_toks, completion_toks = sampler(prompt_messages)
             match = re.search(ANSWER_PATTERN_MULTICHOICE, response_text)
             extracted_answer = match.group(1) if match else None
             score = 1.0 if extracted_answer == correct_answer else 0.0
@@ -71,7 +71,7 @@ class GPQAEval(Eval):
             )
             convo = prompt_messages + [dict(content=response_text, role="assistant")]
             return SingleEvalResult(
-                html=html, score=score, convo=convo, metrics={"chars": len(response_text)}
+                html=html, score=score, convo=convo, metrics={"chars": len(response_text), "num_input_toks": prompt_toks, "num_output_toks": completion_toks}
             )
 
         results = common.map_with_progress(fn, self.examples)

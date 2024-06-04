@@ -4,6 +4,7 @@ from typing import Any
 
 import openai
 from openai import OpenAI
+from openai.types.completion_usage import CompletionUsage
 
 from ..types import MessageList, SamplerBase
 
@@ -52,7 +53,7 @@ class ChatCompletionSampler(SamplerBase):
     def _pack_message(self, role: str, content: Any):
         return {"role": str(role), "content": content}
 
-    def __call__(self, message_list: MessageList) -> str:
+    def __call__(self, message_list: MessageList) -> tuple[str, int, int]:
         if self.system_message:
             message_list = [self._pack_message("system", self.system_message)] + message_list
         trial = 0
@@ -64,7 +65,7 @@ class ChatCompletionSampler(SamplerBase):
                     temperature=self.temperature,
                     max_tokens=self.max_tokens,
                 )
-                return response.choices[0].message.content
+                return response.choices[0].message.content, response.usage.prompt_tokens, response.usage.completion_tokens
             # NOTE: BadRequestError is triggered once for MMMU, please uncomment if you are reruning MMMU
             except openai.BadRequestError as e:
                 print("Bad Request Error", e)

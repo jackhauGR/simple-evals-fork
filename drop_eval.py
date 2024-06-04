@@ -281,7 +281,7 @@ class DropEval(Eval):
 Think step by step, then write a line of the form "Answer: $ANSWER" at the end of your response.
                     """
                     prompt_messages = [sampler._pack_message(content=prompt, role="user")]
-                    response_text = sampler(prompt_messages)
+                    response_text, prompt_toks, completion_toks = sampler(prompt_messages)
                     match = re.search(ANSWER_PATTERN, response_text)
                     extracted_answer = match.group(1) if match else response_text
                     em_score, f1_score = drop_metric(extracted_answer, correct_answers)

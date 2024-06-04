@@ -94,7 +94,7 @@ class MMLUEval(Eval):
             prompt_messages = [
                 sampler._pack_message(content=format_multichoice_question(row), role="user")
             ]
-            response_text = sampler(prompt_messages)
+            response_text, prompt_toks, completion_toks = sampler(prompt_messages)
             match = re.search(ANSWER_PATTERN_MULTICHOICE, response_text)
             extracted_answer = match.group(1) if match else None
             score = 1.0 if extracted_answer == row["Answer"] else 0.0
@@ -107,7 +107,7 @@ class MMLUEval(Eval):
             )
             convo = prompt_messages + [dict(content=response_text, role="assistant")]
             category = subject2category.get(row["Subject"], "other")
-            return SingleEvalResult(html=html, score=score, metrics={category: score}, convo=convo)
+            return SingleEvalResult(html=html, score=score, metrics={category: score, "num_input_toks": prompt_toks, "num_output_toks": completion_toks}, convo=convo)
 
         results = common.map_with_progress(fn, self.examples)
         return common.aggregate_results(results)

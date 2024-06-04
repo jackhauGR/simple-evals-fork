@@ -87,9 +87,10 @@ class HumanEval(Eval):
             prompt_messages = [
                 sampler._pack_message(role="user", content=instruction + sample["prompt"])
             ]
-            completions = [
-                find_code(sampler(prompt_messages)) for _ in range(self._num_samples_per_task)
-            ]
+
+            result, prompt_toks, completion_toks = sampler(prompt_messages)
+            completions = [find_code(result)]
+
             results = evaluate_functional_correctness(sample, completions)
             total = len(results)
             correct = sum(results)
@@ -113,7 +114,7 @@ class HumanEval(Eval):
                     # this will be aggrated so no need of .mean()
                     for k in self._ks_passes
                     if total >= k
-                },
+                } | {"num_input_toks": prompt_toks, "num_output_toks": completion_toks}
             )
 
         results = common.map_with_progress(fn, self.examples, num_threads=3)

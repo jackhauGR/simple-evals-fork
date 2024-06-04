@@ -11,7 +11,7 @@ class SamplerBase:
     or used as part of the grading process.
     """
 
-    def __call__(self, message_list: MessageList) -> str:
+    def __call__(self, message_list: MessageList) -> tuple[str, int, int]:
         raise NotImplementedError
 
 

@@ -105,32 +105,34 @@ def format_multichoice_question(row):
 
 def check_equality(sampler: SamplerBase, expr1: str, expr2: str):
     prompt = EQUALITY_TEMPLATE % {"expression1": expr1, "expression2": expr2}
-    response = sampler([dict(content=prompt, role="user")])
+    response, _, _ = sampler([dict(content=prompt, role="user")])
     return response.lower().strip() == "yes"
 
 
 def _compute_stat(values: list, stat: str):
     if stat == "mean":
-        return np.mean(values)
+        return float(np.mean(values))
     elif stat == "std":
-        return np.std(values)
+        return float(np.std(values))
     elif stat == "min":
-        return np.min(values)
+        return float(np.min(values))
     elif stat == "max":
-        return np.max(values)
+        return float(np.max(values))
+    elif stat == "sum":
+        return float(np.sum(values))
     else:
         raise ValueError(f"Unknown {stat =}")
 
 
 def aggregate_results(
     single_eval_results: list[SingleEvalResult],
-    default_stats: tuple[str] = ("mean", "std"),
-    name2stats: dict[str, tuple[str]] | None = None,
+    default_stats: tuple[str, ...] = ("mean", "std"),
+    name2stats: dict[str, tuple[str, ...]] | None = None,
 ) -> EvalResult:
     """
     Aggregate results from multiple evaluations into a single EvalResult.
     """
-    name2stats = name2stats or {}
+    name2stats = name2stats or {"num_input_toks": ("sum",), "num_output_toks": ("sum",)}
     name2values = defaultdict(list)
     htmls = []
     convos = []

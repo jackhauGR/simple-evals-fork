@@ -164,7 +164,7 @@ class MGSMEval(Eval):
                 )
             ]
             try:
-                response_text = sampler(prompt_messages)
+                response_text, prompt_toks, completion_toks = sampler(prompt_messages)
             except Exception as e:
                 response_text = ""
 
@@ -184,7 +184,7 @@ class MGSMEval(Eval):
                 html=html,
                 score=score,
                 convo=convo,
-                metrics={language: score, latin_language: score},
+                metrics={language: score, latin_language: score, "num_input_toks": prompt_toks, "num_output_toks": completion_toks},
             )
 
         results = common.map_with_progress(fn, self.examples)
