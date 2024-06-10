@@ -1,3 +1,4 @@
+import os
 import time
 
 import anthropic
@@ -28,13 +29,13 @@ class ClaudeCompletionSampler(SamplerBase):
 
     def __init__(
         self,
-        model: str = "claude-3-opus-20240229",
+        model: str = "claude-3-haiku-20240307",
         system_message: str | None = None,
         temperature: float = 0.0,  # default in Anthropic example
         max_tokens: int = 1024,
     ):
         self.api_key_name = "ANTHROPIC_API_KEY"
-        self.client = anthropic.Anthropic()
+        self.client = anthropic.Anthropic(api_key=os.environ.get(self.api_key_name))
         # using api_key=os.environ.get("ANTHROPIC_API_KEY") # please set your API_KEY
         self.model = model
         self.system_message = system_message
@@ -62,17 +63,20 @@ class ClaudeCompletionSampler(SamplerBase):
         return {"role": str(role), "content": content}
 
     def __call__(self, message_list: MessageList) -> str:
+        
+        if self.system_message:
+            message_list = [self._pack_message("system", self.system_message)] + message_list
+
         trial = 0
         while True:
             try:
                 message = self.client.messages.create(
                     model=self.model,
-                    system=self.system_message,
                     max_tokens=self.max_tokens,
                     temperature=self.temperature,
                     messages=message_list,
                 )
-                return message.content[0].text
+                return message.content[0].text, message.usage.input_tokens, message.usage.output_tokens
             except anthropic.RateLimitError as e:
                 exception_backoff = 2**trial  # expontial back off
                 print(
