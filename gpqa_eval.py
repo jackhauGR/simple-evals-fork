@@ -21,12 +21,12 @@ class GPQAEval(Eval):
     def __init__(
         self,
         n_repeats: int = 4,
-        variant: str = "diamond",
+        variant: str = "main",
         num_examples: int | None = None,  # restrict to a subset of the data for debugging
     ):
         df = pandas.read_csv(
             io.StringIO(requests.get(
-                f"https://openaipublic.blob.core.windows.net/simple-evals/gpqa_{variant}.csv"
+                f"https://github.com/jackhauGR/simple-evals-fork/releases/download/SimpleEval-csv-data/gpqa_{variant}.csv"
             ).content.decode())
         )
         examples = [row.to_dict() for _, row in df.iterrows()]
