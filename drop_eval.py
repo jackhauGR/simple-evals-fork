@@ -305,7 +305,7 @@ Think step by step, then write a line of the form "Answer: $ANSWER" at the end o
                         html=html,
                         score=score,
                         convo=convo,
-                        metrics={"em_score": em_score, "f1_score": f1_score},
+                        metrics={"em_score": em_score, "f1_score": f1_score, "num_input_toks": prompt_toks, "num_output_toks": completion_toks},
                     )
 
         results = common.map_with_progress(fn, self.test_samples)
