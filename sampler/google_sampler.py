@@ -16,7 +16,7 @@ class GoogleSampler(SamplerBase):
             self, 
             model: str = "gemini-1.0-pro-latest",
             system_message: str | None = None,
-            temperature: float = 0.0,
+            temperature: float = 1.0,
             max_tokes: int = 1024
     ):
         self.api_key_name = "GOOGLE_API_KEY"

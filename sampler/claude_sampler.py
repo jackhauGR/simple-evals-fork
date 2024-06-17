@@ -31,7 +31,7 @@ class ClaudeCompletionSampler(SamplerBase):
         self,
         model: str = "claude-3-haiku-20240307",
         system_message: str | None = None,
-        temperature: float = 0.0,  # default in Anthropic example
+        temperature: float = 1.0,  # default in Anthropic example
         max_tokens: int = 1024,
     ):
         self.api_key_name = "ANTHROPIC_API_KEY"

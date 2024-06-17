@@ -17,7 +17,7 @@ class CohereSampler(SamplerBase):
         self,
         model: str = "command-r",
         system_message: str | None = None,
-        temperature: float = 0.5,
+        temperature: float = 0.3,
         max_tokens: int = 1024,
     ):
         self.api_key_name = "COHERE_API_KEY"
